@@ -24,9 +24,6 @@ class Grid {
                 return -1;
             }
         }
-        if (isFull) {
-            return 0;
-        }
         let sum = 0;
         for (let i=0; i<3; i++) {
             sum += grid[i*3+i];
@@ -52,6 +49,9 @@ class Grid {
             return 1;
         } else if (sum == -3) {
             return -1;
+        }
+        if (isFull) {
+            return 0;
         }
         return 2;
     }
@@ -127,10 +127,7 @@ function newgame() {
     document.getElementById('grid').hidden = true;
     document.getElementById('option').hidden = false;
     document.getElementById('result').hidden = true;
-    const cells = document.getElementsByClassName('cell');
-    for (const cell of cells){
-        cell.removeAttribute('disabled')
-    }
+    document.getElementById('playValue').setAttribute('value',"");
 }
 
 function renderEnd(sol, userPlayer) {
@@ -154,6 +151,7 @@ function renderEnd(sol, userPlayer) {
     for (let cell of cells) {
         cell.disabled = true;
     }
+    document.getElementById('playValue').setAttribute('value',"");
 }
 
 function computerPlay() {
@@ -196,20 +194,26 @@ function computerPlay() {
         }
         return;
     }
-    renderEnd(sol, userPlayer)
+    renderEnd(sol, userPlayer);
 }
 
 function playAsX() {
     document.getElementById('playValue').setAttribute('value', "X");
-    document.getElementById('grid').hidden = false;
+    const cells = document.getElementsByClassName('cell');
+    for (const cell of cells){
+        cell.removeAttribute('disabled')
+    }
     document.getElementById('option').hidden = true;
 }
 
 function playAsO() {
     document.getElementById('playValue').setAttribute('value', "O");
-    document.getElementById('grid').hidden = false;
+    const cells = document.getElementsByClassName('cell');
+    for (const cell of cells){
+        cell.removeAttribute('disabled')
+    }
     document.getElementById('option').hidden = true;
-    computerPlay()
+    computerPlay();
 }
 function play(btn) {
     btn.innerText = document.getElementById('playValue').getAttribute('value');
