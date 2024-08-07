@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <script src="scripts/script.js"></script>
+    <header>
+        <nav>
+            <ul>
+                <li><button type="button" id="new-game" onclick="newgame()">New Game</button></li>
+            </ul>
+            <ul id="option" hidden>
+                <li><button type="button" onclick="playAsX()">Play as X</button></li>
+                <pre></pre>
+                <li><button type="button" onclick="playAsO()">Play as O</button></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <input type="hidden" name="value" id="playValue" value="">
+        <div id="result" hidden></div>
+        <div class="container">
+            <table id="grid" hidden>
+            <tr id="row0">
+                <td class="cell0"><button type="button" onclick="play(this)" class="cell" id="cell0"></button></td>
+                <td class="cell1"><button type="button" onclick="play(this)" class="cell" id="cell1"></button></td>
+                <td class="cell2"><button type="button" onclick="play(this)" class="cell" id="cell2"></button></td>
+            </tr>
+            <tr id="row1">
+                <td class="cell3"><button type="button" onclick="play(this)" class="cell" id="cell3"></button></td>
+                <td class="cell4"><button type="button" onclick="play(this)" class="cell" id="cell4"></button></td>
+                <td class="cell5"><button type="button" onclick="play(this)" class="cell" id="cell5"></button></td>
+            </tr>
+            <tr id="row2">
+                <td class="cell6"><button type="button" onclick="play(this)" class="cell" id="cell6"></button></td>
+                <td class="cell7"><button type="button" onclick="play(this)" class="cell" id="cell7"></button></td>
+                <td class="cell8"><button type="button" onclick="play(this)" class="cell" id="cell8"></button></td>
+            </tr>
+            </table>
+        </div>
+    </main>
+</body>
+</html>
