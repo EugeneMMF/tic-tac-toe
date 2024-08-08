@@ -17,7 +17,6 @@ class Grid {
                 }
                 sum += grid[j*3+i];
             }
-            // console.log(`horizontal sum${j}=${sum}`);
             if (sum == 3) {
                 return 1;
             } else if (sum == -3) {
@@ -28,7 +27,6 @@ class Grid {
         for (let i=0; i<3; i++) {
             sum += grid[i*3+i];
         }
-        // console.log(`diagonal sum=${sum}`);
         if (sum == 3) {
             return 1;
         } else if (sum == -3) {
@@ -36,7 +34,6 @@ class Grid {
         }
         for (let i=0; i<3; i++) {
             sum = grid[i] + grid[i+3] + grid[i+6];
-            // console.log(`vertical sum${i}=${sum}`);
             if (sum == 3) {
                 return 1;
             } else if (sum == -3) {
@@ -44,7 +41,6 @@ class Grid {
             }
         }
         sum = grid[2] + grid[4] + grid[6];
-        // console.log(`antidiagonal sum=${sum}`);
         if (sum == 3) {
             return 1;
         } else if (sum == -3) {
@@ -54,6 +50,51 @@ class Grid {
             return 0;
         }
         return 2;
+    }
+
+    getWin(grid) {
+        let isFull = true;
+        for (let j=0; j<3; j++) {
+            let sum = 0;
+            for (let i=0; i<3; i++) {
+                if (grid[j*3+i] == 0) {
+                    isFull = false;
+                }
+                sum += grid[j*3+i];
+            }
+            if (sum == 3) {
+                return [1, "horizontal", j];
+            } else if (sum == -3) {
+                return [-1, "horizontal", j];
+            }
+        }
+        let sum = 0;
+        for (let i=0; i<3; i++) {
+            sum += grid[i*3+i];
+        }
+        if (sum == 3) {
+            return [1, "diagonal", 0];
+        } else if (sum == -3) {
+            return [-1, "diagonal", 0];
+        }
+        for (let i=0; i<3; i++) {
+            sum = grid[i] + grid[i+3] + grid[i+6];
+            if (sum == 3) {
+                return [1, "vertical", i];
+            } else if (sum == -3) {
+                return [-1, "vertical", i];
+            }
+        }
+        sum = grid[2] + grid[4] + grid[6];
+        if (sum == 3) {
+            return [1, "diagonal", 1];
+        } else if (sum == -3) {
+            return [-1, "diagonal", 1];
+        }
+        if (isFull) {
+            return [0, "draw", 0];
+        }
+        return [2, "", 0];
     }
 
     getBestPlay(grid, player) {
@@ -85,7 +126,7 @@ class Grid {
         if (player == 1) {
             values = Array(9).fill(-10);
         } else {
-            values = Array(9).fill(10)
+            values = Array(9).fill(10);
         }
         let currentGridValue = this.end(this.grid);
         if (currentGridValue != 2){
@@ -106,10 +147,10 @@ class Grid {
         console.log(values);
         if (player == 1) {
             val = Math.max(...values);
-            return values.indexOf(val);
+            return [val, values];
         } else {
             val = Math.min(...values);
-            return values.indexOf(val);
+            return [val, values];
         }
     }
 }
@@ -128,33 +169,92 @@ function newgame() {
     document.getElementById('option').hidden = false;
     document.getElementById('result').hidden = true;
     document.getElementById('playValue').setAttribute('value',"");
+    document.getElementById('firstPlay').setAttribute('value',true);
+    document.getElementById('caution').setAttribute("hidden",true);
+    let canvas = document.getElementById('helper');
+    let context = canvas.getContext('2d');
+    let canvasWidth = canvas.width;
+    let canvasHeight = canvas.height;
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
 }
 
-function renderEnd(sol, userPlayer) {
-    if (sol == userPlayer) {
-        const result = document.getElementById('result');
-        result.setAttribute('class', 'winner');
-        result.hidden = false;
-        result.innerText = ":) Congradulations! You Won! :)";
-    } else if (sol == 0) {
-        const result = document.getElementById('result');
-        result.setAttribute('class','draw');
-        result.hidden = false;
-        result.innerText = ":| Draw! :|";
-    } else {
-        const result = document.getElementById('result');
-        result.setAttribute('class','loser');
-        result.innerText = ":( Sorry! Computer wins! :(";
-        result.hidden = false;
+function renderEnd(sol, userPlayer, direction, type, actualPlay) {
+    if (actualPlay) {
+        if (sol == userPlayer) {
+            const result = document.getElementById('result');
+            result.setAttribute('class', 'winner');
+            result.hidden = false;
+            result.innerText = ":) Congradulations! You Won! :)";
+        } else if (sol == 0) {
+            const result = document.getElementById('result');
+            result.setAttribute('class','draw');
+            result.hidden = false;
+            result.innerText = ":| Draw! :|";
+        } else {
+            const result = document.getElementById('result');
+            result.setAttribute('class','loser');
+            result.innerText = ":( Sorry! Computer wins! :(";
+            result.hidden = false;
+        }
+        const cells = document.getElementsByClassName('cell');
+        for (let cell of cells) {
+            cell.disabled = true;
+        }
+        document.getElementById('playValue').setAttribute('value',"");
     }
-    const cells = document.getElementsByClassName('cell');
-    for (let cell of cells) {
-        cell.disabled = true;
+    if (sol != 2) {
+        let canvas = document.getElementById('helper');
+        let context = canvas.getContext('2d');
+        let canvasWidth = canvas.width;
+        let canvasHeight = canvas.height;
+        context.clearRect(0, 0, canvasWidth, canvasHeight);
+        if (sol == 0) {
+            return;
+        } else {
+            if (!actualPlay) {
+                if (sol != userPlayer) {
+                    context.strokeStyle = "#ff0000";
+                    let caution = document.getElementById('caution');
+                    caution.innerText = "You will lose!"
+                    caution.setAttribute('class', "losertext");
+                    caution.removeAttribute("hidden");
+                } else {
+                    context.strokeStyle = "#00ff00";
+                    let caution = document.getElementById('caution');
+                    caution.innerText = "You will win!"
+                    caution.setAttribute('class', "winner");
+                    caution.removeAttribute("hidden");
+                }
+            }
+            context.beginPath();
+            if (direction == "diagonal") {
+                if (type == 0) {
+                    // main diagonal
+                    context.moveTo(0, 0);
+                    context.lineTo(canvasWidth, canvasHeight);
+                    context.stroke();
+                } else {
+                    // secondary diagonal
+                    context.moveTo(canvasWidth, 0);
+                    context.lineTo(0, canvasHeight);
+                    context.stroke();
+                }
+            } else if (direction == "vertical") {
+                let location = Math.floor(type * (canvasWidth/3) + (canvasWidth/6));
+                context.moveTo(location, 0);
+                context.lineTo(location, canvasHeight);
+                context.stroke();
+            } else if (direction == "horizontal") {
+                let location = Math.floor(type * (canvasHeight/3) + (canvasHeight/6));
+                context.moveTo(0, location);
+                context.lineTo(canvasWidth, location);
+                context.stroke();
+            }
+        }
     }
-    document.getElementById('playValue').setAttribute('value',"");
 }
 
-function computerPlay() {
+function computerPlay(actualPlay) {
     const cells = document.getElementsByClassName('cell');
     const player = document.getElementById('playValue').getAttribute('value');
     let computer;
@@ -182,19 +282,46 @@ function computerPlay() {
         }
     }
     let grid = new Grid(values);
-    let sol = grid.end(grid.grid);
+    let [sol,direction,type] = grid.getWin(grid.grid);
     if (sol == 2) {
-        sol = grid.play(currentPlayer);
+        let [chosen,vals] = grid.play(currentPlayer);
+        if (chosen != 0) {
+            for (let i=0; i<vals.length; i++) {
+                if (vals[i] == chosen) {
+                    let temp_grid = [...values];
+                    temp_grid[i] = currentPlayer;
+                    let temp_end = grid.end(temp_grid);
+                    sol = i;
+                    if (temp_end == 1 || temp_end == -1) {
+                        break;
+                    }
+                }
+            }
+        } else {
+            sol = vals.indexOf(chosen);
+        }
         grid.grid[sol] = currentPlayer;
+        if (!actualPlay) {
+            cells[sol].innerText = computer;
+            cells[sol].setAttribute("style", "color: grey;");
+            let [newsol, direction1, type1] = grid.getWin(grid.grid);
+            document.getElementById("computerFuturePlay").setAttribute('value', sol);
+            renderEnd(newsol, userPlayer, direction1, type1, false);
+            return sol;
+        }
         cells[sol].innerText = computer;
-        sol = grid.end(grid.grid);
+        cells[sol].disabled = true;
+        [sol,direction,type] = grid.getWin(grid.grid);
         console.log(`current sol=${sol}`);
         if (sol !== 2) {
-            renderEnd(sol, userPlayer);
+            renderEnd(sol, userPlayer, direction, type, true);
         }
         return;
     }
-    renderEnd(sol, userPlayer);
+    if (actualPlay) {
+        renderEnd(sol, userPlayer, direction, type, true);
+    }
+    return null;
 }
 
 function playAsX() {
@@ -213,10 +340,67 @@ function playAsO() {
         cell.removeAttribute('disabled')
     }
     document.getElementById('option').hidden = true;
-    computerPlay();
+    let first = document.getElementById('firstPlay');
+    if (first.getAttribute('value') == "true") {
+        first.setAttribute("value", "false");
+        cells[4].innerText = "X";
+        cells[4].disabled = true;
+        return;
+    }
+    computerPlay(true);
 }
+
 function play(btn) {
     btn.innerText = document.getElementById('playValue').getAttribute('value');
+    btn.setAttribute("style","color: black;");
+    let canvas = document.getElementById('helper');
+    let context = canvas.getContext('2d');
+    let canvasWidth = canvas.width;
+    let canvasHeight = canvas.height;
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
+    document.getElementById('caution').setAttribute("hidden",true);
+    document.getElementById('firstPlay').setAttribute('value',"false");
     btn.disabled = true;
-    computerPlay();
+    if (document.getElementById('assisted').checked) {
+        let val = document.getElementById("computerFuturePlay").getAttribute('value');
+        if (val != "") {
+            document.getElementById('cell'+val).innerText = "";
+            document.getElementById('cell'+val).setAttribute("style", "color: black;")
+            document.getElementById("computerFuturePlay").setAttribute('value', "");
+        }
+    }
+    computerPlay(true);
+}
+
+function assist(btn) {
+    if (!document.getElementById('assisted').checked || btn.disabled || document.getElementById('playValue').getAttribute('value') == "" || document.getElementById('firstPlay').getAttribute('value') == "true"){
+        return;
+    }
+    btn.innerText = document.getElementById('playValue').getAttribute('value');
+    btn.setAttribute("style","color: grey;");
+    let val = computerPlay(false);
+    if (val === null) {
+        document.getElementById("computerFuturePlay").setAttribute('value', "");
+    } else {
+        document.getElementById("computerFuturePlay").setAttribute('value', val);
+    }
+}
+
+function deassist(btn) {
+    if (!document.getElementById('assisted').checked || btn.disabled || document.getElementById('firstPlay').getAttribute('value') == "true"){
+        return;
+    }
+    let canvas = document.getElementById('helper');
+    let context = canvas.getContext('2d');
+    let canvasWidth = canvas.width;
+    let canvasHeight = canvas.height;
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
+    btn.innerText = "";
+    btn.setAttribute("style","color: black;");
+    var val = document.getElementById("computerFuturePlay").getAttribute('value');
+    document.getElementById('caution').setAttribute("hidden",true);
+    if (val != "") {
+        document.getElementById('cell'+val).innerText = "";
+        document.getElementById("computerFuturePlay").setAttribute('value', "");
+    }
 }
