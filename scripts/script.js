@@ -171,6 +171,7 @@ function newgame() {
     document.getElementById('playValue').setAttribute('value',"");
     document.getElementById('firstPlay').setAttribute('value',true);
     document.getElementById('caution').setAttribute("hidden",true);
+    document.getElementsByTagName('body')[0].removeAttribute("class");
     let canvas = document.getElementById('helper');
     let context = canvas.getContext('2d');
     let canvasWidth = canvas.width;
@@ -183,16 +184,19 @@ function renderEnd(sol, userPlayer, direction, type, actualPlay) {
         if (sol == userPlayer) {
             const result = document.getElementById('result');
             result.setAttribute('class', 'winner');
+            document.getElementsByTagName('body')[0].setAttribute("class", "greenborderpermanent");
             result.hidden = false;
             result.innerText = ":) Congradulations! You Won! :)";
         } else if (sol == 0) {
             const result = document.getElementById('result');
             result.setAttribute('class','draw');
+            document.getElementsByTagName('body')[0].setAttribute("class", "greyborderpermanent");
             result.hidden = false;
             result.innerText = ":| Draw! :|";
         } else {
             const result = document.getElementById('result');
             result.setAttribute('class','loser');
+            document.getElementsByTagName('body')[0].setAttribute("class", "redborderpermanent");
             result.innerText = ":( Sorry! Computer wins! :(";
             result.hidden = false;
         }
@@ -215,16 +219,25 @@ function renderEnd(sol, userPlayer, direction, type, actualPlay) {
                 if (sol != userPlayer) {
                     context.strokeStyle = "#ff0000";
                     let caution = document.getElementById('caution');
-                    caution.innerText = "You will lose!"
+                    let grid = document.getElementById("grid");
+                    caution.innerText = "You will lose!";
                     caution.setAttribute('class', "losertext");
+                    grid.setAttribute('class', "container zoominout");
+                    document.getElementsByTagName('body')[0].setAttribute("class", "redborder");
                     caution.removeAttribute("hidden");
                 } else {
                     context.strokeStyle = "#00ff00";
                     let caution = document.getElementById('caution');
                     caution.innerText = "You will win!"
                     caution.setAttribute('class', "winner");
+                    document.getElementsByTagName('body')[0].setAttribute("class", "greenborder");
                     caution.removeAttribute("hidden");
                 }
+            }
+            if (sol != userPlayer) {
+                context.strokeStyle = "#ff0000";
+            } else {
+                context.strokeStyle = "#00ff00";
             }
             context.beginPath();
             if (direction == "diagonal") {
@@ -357,8 +370,11 @@ function play(btn) {
     let context = canvas.getContext('2d');
     let canvasWidth = canvas.width;
     let canvasHeight = canvas.height;
+    let grid = document.getElementById("grid");
     context.clearRect(0, 0, canvasWidth, canvasHeight);
     document.getElementById('caution').setAttribute("hidden",true);
+    grid.setAttribute('class', "container");
+    document.getElementsByTagName('body')[0].removeAttribute("class");
     document.getElementById('firstPlay').setAttribute('value',"false");
     btn.disabled = true;
     if (document.getElementById('assisted').checked) {
@@ -394,11 +410,14 @@ function deassist(btn) {
     let context = canvas.getContext('2d');
     let canvasWidth = canvas.width;
     let canvasHeight = canvas.height;
+    let grid = document.getElementById("grid");
     context.clearRect(0, 0, canvasWidth, canvasHeight);
     btn.innerText = "";
     btn.setAttribute("style","color: black;");
     var val = document.getElementById("computerFuturePlay").getAttribute('value');
     document.getElementById('caution').setAttribute("hidden",true);
+    grid.setAttribute('class', "container");
+    document.getElementsByTagName('body')[0].removeAttribute("class");
     if (val != "") {
         document.getElementById('cell'+val).innerText = "";
         document.getElementById("computerFuturePlay").setAttribute('value', "");
